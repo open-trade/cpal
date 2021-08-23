@@ -740,6 +740,10 @@ fn poll_descriptors_and_prepare_buffer(
         }
         res => res,
     }? as usize;
+    if avail_frames > 1024 * 1024 * 64 { 
+       let description = String::from("`alsa::poll()` spuriously returned");
+       return Err(BackendSpecificError { description });
+    }  
     let delay_frames = match status.get_delay() {
         // Buffer underrun. TODO: Notify the user.
         d if d < 0 => 0,
